@@ -24,6 +24,7 @@ impl RobotPosition {
         RobotPosition { x, y }
     }
 
+    // We can't generate WASM bindings for functions of the Display trait!
     #[wasm_bindgen]
     pub fn to_string(&self) -> String {
         format!("{:?}", self)
