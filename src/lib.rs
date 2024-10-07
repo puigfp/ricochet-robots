@@ -18,6 +18,14 @@ pub struct RobotPosition {
 }
 
 #[wasm_bindgen]
+impl RobotPosition {
+    #[wasm_bindgen(constructor)]
+    pub fn new(x: usize, y: usize) -> RobotPosition {
+        RobotPosition { x, y }
+    }
+}
+
+#[wasm_bindgen]
 pub fn robot_position_to_string(robot_position: RobotPosition) -> String {
     format!("{:?}", robot_position)
 }
