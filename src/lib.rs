@@ -23,9 +23,9 @@ impl RobotPosition {
     pub fn new(x: usize, y: usize) -> RobotPosition {
         RobotPosition { x, y }
     }
-}
 
-#[wasm_bindgen]
-pub fn robot_position_to_string(robot_position: RobotPosition) -> String {
-    format!("{:?}", robot_position)
+    #[wasm_bindgen]
+    pub fn to_string(&self) -> String {
+        format!("{:?}", self)
+    }
 }
