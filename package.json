@@ -1,0 +1,8 @@
+{
+    "private": true,
+    "workspaces": [
+        "solver_library",
+        "webapp"
+    ],
+    "packageManager": "yarn@4.5.0"
+}
