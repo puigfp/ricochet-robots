@@ -3,6 +3,9 @@ use super::Position;
 pub trait WallConfiguration {
     fn is_valid(&self) -> bool;
 
+    fn get_height(&self) -> usize;
+    fn get_width(&self) -> usize;
+
     // How far can a robot travel until hitting a wall?
     fn next_wall_up(&self, position: &Position) -> Option<usize>;
     fn next_wall_down(&self, position: &Position) -> Option<usize>;
@@ -11,10 +14,11 @@ pub trait WallConfiguration {
 }
 
 pub struct WallConfigurationVecVec {
-    height: usize,
-    width: usize,
-    right_walls: Vec<Vec<usize>>,
-    bottom_walls: Vec<Vec<usize>>,
+    // TODO: make these private
+    pub height: usize,
+    pub width: usize,
+    pub right_walls: Vec<Vec<usize>>,
+    pub bottom_walls: Vec<Vec<usize>>,
 }
 
 impl WallConfigurationVecVec {
@@ -33,6 +37,14 @@ impl WallConfigurationVecVec {
 }
 
 impl WallConfiguration for WallConfigurationVecVec {
+    fn get_height(&self) -> usize {
+        self.height
+    }
+
+    fn get_width(&self) -> usize {
+        self.width
+    }
+
     fn is_valid(&self) -> bool {
         self.right_walls.len() == self.height
             && self.bottom_walls.len() == self.width

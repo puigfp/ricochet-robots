@@ -1,6 +1,9 @@
 use super::Position;
 
-pub trait RobotPositions {
+pub trait RobotPositions
+where
+    Self: Clone,
+{
     fn get_robot_position(&self, robot: usize) -> &Position;
     fn num_robots(&self) -> usize;
     fn update(&self, robot: usize, position: Position) -> Self;
@@ -12,8 +15,10 @@ pub trait RobotPositions {
     fn next_robot_left(&self, position: &Position) -> Option<usize>;
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct RobotPositionsVec {
-    positions: Vec<Position>,
+    // TODO: make this private
+    pub positions: Vec<Position>,
 }
 
 impl RobotPositions for RobotPositionsVec {
