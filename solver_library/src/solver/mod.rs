@@ -1,5 +1,7 @@
+mod robot_positions;
 mod wall_configuration;
 
+#[derive(Clone, Debug)]
 struct Position {
     row: usize,
     col: usize,

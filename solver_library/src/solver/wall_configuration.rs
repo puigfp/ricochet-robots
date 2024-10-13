@@ -1,11 +1,13 @@
 use super::Position;
 
 pub trait WallConfiguration {
+    fn is_valid(&self) -> bool;
+
     // How far can a robot travel until hitting a wall?
-    fn next_wall_up(&self, position: &Position) -> usize;
-    fn next_wall_down(&self, position: &Position) -> usize;
-    fn next_wall_right(&self, position: &Position) -> usize;
-    fn next_wall_left(&self, position: &Position) -> usize;
+    fn next_wall_up(&self, position: &Position) -> Option<usize>;
+    fn next_wall_down(&self, position: &Position) -> Option<usize>;
+    fn next_wall_right(&self, position: &Position) -> Option<usize>;
+    fn next_wall_left(&self, position: &Position) -> Option<usize>;
 }
 
 pub struct WallConfigurationVecVec {
@@ -16,6 +18,21 @@ pub struct WallConfigurationVecVec {
 }
 
 impl WallConfigurationVecVec {
+    fn next_wall(walls: &[usize], position: usize, diff: isize) -> Option<usize> {
+        let candidate_walls = walls.iter().filter(|pos| match diff {
+            1 => **pos >= position,
+            -1 => **pos < position,
+            _ => unreachable!(),
+        });
+        match diff {
+            1 => candidate_walls.min().copied(),
+            -1 => candidate_walls.max().map(|pos| pos + 1),
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl WallConfiguration for WallConfigurationVecVec {
     fn is_valid(&self) -> bool {
         self.right_walls.len() == self.height
             && self.bottom_walls.len() == self.width
@@ -31,55 +48,35 @@ impl WallConfigurationVecVec {
                 .all(|row| *row < self.height)
     }
 
-    fn next_wall(walls: &[usize], position: usize, diff: isize, default: usize) -> usize {
-        let candidate_walls = walls.iter().filter(|pos| match diff {
-            1 => **pos >= position,
-            -1 => **pos < position,
-            _ => unreachable!(),
-        });
-        let first_wall = match diff {
-            1 => candidate_walls.min().copied(),
-            -1 => candidate_walls.max().map(|pos| pos + 1),
-            _ => unreachable!(),
-        };
-        first_wall.unwrap_or(default)
-    }
-}
-
-impl WallConfiguration for WallConfigurationVecVec {
-    fn next_wall_up(&self, position: &Position) -> usize {
+    fn next_wall_up(&self, position: &Position) -> Option<usize> {
         WallConfigurationVecVec::next_wall(
             self.bottom_walls.get(position.col).unwrap(),
             position.row,
             -1,
-            0,
         )
     }
 
-    fn next_wall_down(&self, position: &Position) -> usize {
+    fn next_wall_down(&self, position: &Position) -> Option<usize> {
         WallConfigurationVecVec::next_wall(
             self.bottom_walls.get(position.col).unwrap(),
             position.row,
             1,
-            self.height - 1,
         )
     }
 
-    fn next_wall_right(&self, position: &Position) -> usize {
+    fn next_wall_right(&self, position: &Position) -> Option<usize> {
         WallConfigurationVecVec::next_wall(
             self.right_walls.get(position.row).unwrap(),
             position.col,
             1,
-            self.width - 1,
         )
     }
 
-    fn next_wall_left(&self, position: &Position) -> usize {
+    fn next_wall_left(&self, position: &Position) -> Option<usize> {
         WallConfigurationVecVec::next_wall(
             self.right_walls.get(position.row).unwrap(),
             position.col,
             -1,
-            0,
         )
     }
 }
@@ -87,8 +84,10 @@ impl WallConfiguration for WallConfigurationVecVec {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     #[test]
+    #[wasm_bindgen_test]
     fn test_wall_configuration() {
         let wall_configuration = WallConfigurationVecVec {
             height: 6,
@@ -97,29 +96,27 @@ mod tests {
             bottom_walls: vec![vec![1, 2], vec![], vec![], vec![], vec![]],
         };
         assert!(wall_configuration.is_valid());
+        type Case = (
+            Position,
+            Option<usize>,
+            Option<usize>,
+            Option<usize>,
+            Option<usize>,
+        );
+        let cases: Vec<Case> = vec![
+            (Position::new(2, 2), None, None, None, None), // clear row and column
+            (Position::new(0, 0), None, Some(1), Some(1), None),
+            (Position::new(0, 3), None, None, None, Some(3)),
+            (Position::new(3, 0), Some(3), None, None, None),
+            (Position::new(0, 2), None, None, Some(2), Some(2)), // horizontally stuck between two walls
+            (Position::new(2, 0), Some(2), Some(2), None, None), // vertically stuck between two walls
+        ];
 
-        // clear row and column
-        assert_eq!(wall_configuration.next_wall_right(&Position::new(2, 2)), 4); // hit the right side of the board
-        assert_eq!(wall_configuration.next_wall_left(&Position::new(2, 2)), 0); // hit the left side of the board
-        assert_eq!(wall_configuration.next_wall_up(&Position::new(2, 2)), 0); // hit the top side of the board
-        assert_eq!(wall_configuration.next_wall_down(&Position::new(2, 2)), 5); // hit the bottom side of the board
-
-        assert_eq!(wall_configuration.next_wall_right(&Position::new(0, 0)), 1); // hit a wall
-        assert_eq!(wall_configuration.next_wall_left(&Position::new(0, 0)), 0); // hit the left side of the board
-
-        assert_eq!(wall_configuration.next_wall_right(&Position::new(0, 3)), 4); // hit the right side of the board
-        assert_eq!(wall_configuration.next_wall_left(&Position::new(0, 3)), 3); // hit a wall
-
-        assert_eq!(wall_configuration.next_wall_right(&Position::new(0, 2)), 2); // hit a wall
-        assert_eq!(wall_configuration.next_wall_left(&Position::new(0, 2)), 2); // hit a wall
-
-        assert_eq!(wall_configuration.next_wall_down(&Position::new(0, 0)), 1); // hit a wall
-        assert_eq!(wall_configuration.next_wall_up(&Position::new(0, 0)), 0); // hit the top side of the board
-
-        assert_eq!(wall_configuration.next_wall_down(&Position::new(3, 0)), 5); // hit the bottom side of the board
-        assert_eq!(wall_configuration.next_wall_up(&Position::new(3, 0)), 3); // hit a wall
-
-        assert_eq!(wall_configuration.next_wall_down(&Position::new(2, 0)), 2); // hit a wall
-        assert_eq!(wall_configuration.next_wall_up(&Position::new(2, 0)), 2); // hit a wall
+        for (position, up, down, right, left) in cases {
+            assert_eq!(wall_configuration.next_wall_up(&position), up);
+            assert_eq!(wall_configuration.next_wall_down(&position), down);
+            assert_eq!(wall_configuration.next_wall_right(&position), right);
+            assert_eq!(wall_configuration.next_wall_left(&position), left);
+        }
     }
 }
