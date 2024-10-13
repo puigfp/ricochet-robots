@@ -14,49 +14,57 @@ struct WallConfigurationVecVec {
     bottom_walls: Vec<Vec<usize>>,
 }
 
+impl WallConfigurationVecVec {
+    fn next_wall(walls: &[usize], position: usize, diff: isize, default: usize) -> usize {
+        let candidate_walls = walls.iter().filter(|pos| match diff {
+            1 => **pos >= position,
+            -1 => **pos < position,
+            _ => unreachable!(),
+        });
+        let first_wall = match diff {
+            1 => candidate_walls.min().copied(),
+            -1 => candidate_walls.max().map(|pos| pos + 1),
+            _ => unreachable!(),
+        };
+        first_wall.unwrap_or(default)
+    }
+}
+
 impl WallConfiguration for WallConfigurationVecVec {
     fn next_wall_up(&self, position: Position) -> usize {
-        self.bottom_walls
-            .get(position.col)
-            .unwrap()
-            .iter()
-            .filter(|row| **row < position.row)
-            .max()
-            .map(|row: &usize| row + 1)
-            .unwrap_or(0)
+        WallConfigurationVecVec::next_wall(
+            self.bottom_walls.get(position.col).unwrap(),
+            position.row,
+            -1,
+            0,
+        )
     }
 
     fn next_wall_down(&self, position: Position) -> usize {
-        self.bottom_walls
-            .get(position.col)
-            .unwrap()
-            .iter()
-            .filter(|row| **row >= position.row)
-            .min()
-            .copied()
-            .unwrap_or(self.height - 1)
+        WallConfigurationVecVec::next_wall(
+            self.bottom_walls.get(position.col).unwrap(),
+            position.row,
+            1,
+            self.height - 1,
+        )
     }
 
     fn next_wall_right(&self, position: Position) -> usize {
-        self.right_walls
-            .get(position.row)
-            .unwrap()
-            .iter()
-            .filter(|col| **col >= position.col)
-            .min()
-            .copied()
-            .unwrap_or(self.width - 1)
+        WallConfigurationVecVec::next_wall(
+            self.right_walls.get(position.row).unwrap(),
+            position.col,
+            1,
+            self.width - 1,
+        )
     }
 
     fn next_wall_left(&self, position: Position) -> usize {
-        self.right_walls
-            .get(position.row)
-            .unwrap()
-            .iter()
-            .filter(|col| **col < position.col)
-            .max()
-            .map(|col| col + 1)
-            .unwrap_or(0)
+        WallConfigurationVecVec::next_wall(
+            self.right_walls.get(position.row).unwrap(),
+            position.col,
+            -1,
+            0,
+        )
     }
 }
 
