@@ -19,3 +19,17 @@ wasm-pack build --target bundler
 ```sh
 wasm-pack build --target nodejs
 ```
+
+## Running unit tests
+
+### Natively
+
+```sh
+cargo test
+```
+
+### In WASM
+
+```sh
+wasm-pack test --node
+```
