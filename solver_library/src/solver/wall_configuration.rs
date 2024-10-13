@@ -1,8 +1,10 @@
 use super::Position;
 
+// Trait for immutable containers holding the layout of the walls
 pub trait WallConfiguration {
     fn is_valid(&self) -> bool;
 
+    // XXX: this probably should not live here, it's shared by the entire board
     fn get_height(&self) -> usize;
     fn get_width(&self) -> usize;
 
@@ -13,6 +15,7 @@ pub trait WallConfiguration {
     fn next_wall_left(&self, position: &Position) -> Option<usize>;
 }
 
+// Immutable container storing the layout of the walls in a Vec<Vec<usize>>
 pub struct WallConfigurationVecVec {
     // TODO: make these private
     pub height: usize,

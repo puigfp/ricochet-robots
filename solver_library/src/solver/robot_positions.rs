@@ -1,5 +1,6 @@
 use super::Position;
 
+// Immutable container for the positions of the robots
 pub trait RobotPositions
 where
     Self: Clone,
@@ -31,6 +32,7 @@ impl RobotPositions for RobotPositionsVec {
     }
 
     fn update(&self, robot: usize, position: Position) -> Self {
+        // There are very few robots, so let's not overengineer this.
         let mut positions_cloned = self.positions.clone();
         positions_cloned[robot] = position;
         RobotPositionsVec {

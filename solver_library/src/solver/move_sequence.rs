@@ -2,12 +2,15 @@ use std::rc::Rc;
 
 use super::{robot_positions::RobotPositions, Direction};
 
+// Immutable container for a robot move
 #[derive(Clone, Debug, PartialEq)]
 pub struct Move {
     pub robot: usize,
     pub direction: Direction,
 }
 
+// Trait for immutable containers holding a sequence of moves
+// TODO: all types implementing this trait should also implement IntoIterator<(Move, P)>
 trait MoveSequence<P>
 where
     P: RobotPositions,
@@ -16,7 +19,7 @@ where
     fn append(&self, move_: Move, next_positions: P) -> Self;
 }
 
-// Move sequence backed by a vec that's duplicated on append
+// Move sequence backed by a Vec that's duplicated on append
 struct MoveSequenceVec<P>
 where
     P: RobotPositions,
@@ -37,6 +40,8 @@ impl<P: RobotPositions> MoveSequence<P> for MoveSequenceVec<P> {
 }
 
 // Move sequence backed by a linked list leveraging Rc for structural sharing
+// This should be way faster than MoveSequenceVec when the search is dealing
+// with very long move sequences
 struct MoveSequenceLinkedList<P>
 where
     P: RobotPositions,
