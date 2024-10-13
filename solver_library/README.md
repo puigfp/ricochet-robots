@@ -11,7 +11,7 @@ cargo install wasm-pack
 ### For a bundler
 
 ```sh
-wasm-pack build --target bundler
+wasm-pack build --target web
 ```
 
 ### For Node.js
