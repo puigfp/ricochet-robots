@@ -1,6 +1,7 @@
 use super::Position;
 
 // Immutable container for the positions of the robots
+// TODO: all types implementing this trait should also be hashable (so that we can dedupe states during the search)
 pub trait RobotPositions
 where
     Self: Clone,
