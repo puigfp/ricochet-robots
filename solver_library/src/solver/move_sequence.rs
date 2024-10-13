@@ -16,6 +16,7 @@ where
     fn append(&self, move_: Move, next_positions: P) -> Self;
 }
 
+// Move sequence backed by a vec that's duplicated on append
 struct MoveSequenceVec<P>
 where
     P: RobotPositions,
@@ -35,6 +36,7 @@ impl<P: RobotPositions> MoveSequence<P> for MoveSequenceVec<P> {
     }
 }
 
+// Move sequence backed by a linked list leveraging Rc for structural sharing
 struct MoveSequenceLinkedList<P>
 where
     P: RobotPositions,
