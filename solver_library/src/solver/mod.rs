@@ -1,4 +1,3 @@
-use move_sequence::Move;
 use robot_positions::RobotPositions;
 use wall_configuration::WallConfiguration;
 
