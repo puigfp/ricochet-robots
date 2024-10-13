@@ -1,7 +1,7 @@
 {
     "private": true,
     "workspaces": [
-        "solver_library",
+        "solver_library/pkg",
         "webapp"
     ],
     "packageManager": "yarn@4.5.0"
