@@ -11,6 +11,14 @@ pub fn greet(name: &str) {
 }
 
 #[wasm_bindgen]
+pub fn fib(i: usize) -> usize {
+    if (i < 2) {
+        return 1;
+    }
+    fib(i - 1) + fib(i - 2)
+}
+
+#[wasm_bindgen]
 #[derive(Debug)]
 pub struct RobotPosition {
     pub x: usize,

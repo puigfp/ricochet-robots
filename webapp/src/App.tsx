@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
 
-import * as solver from "ricochet-robots-solver/ricochet_robots";
+import * as solver from "ricochet-robots-solver/ricochet_robots_solver";
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  console.log(new solver.RobotPosition(5, 5));
+  const [count, setCount] = useState(0);
+  const [input, setInput] = useState("5");
+  const [result, setResult] = useState(0);
 
   return (
     <>
@@ -32,8 +32,25 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+
+      <input content={input} onChange={(e) => setInput(e.target.value)} />
+      <p>{result}</p>
+      <button
+        onClick={() => {
+          const worker = new Worker(new URL("./worker.ts", import.meta.url), {
+            type: "module",
+          });
+          worker.onmessage = (ev) => {
+            setResult(ev.data);
+            worker.terminate();
+          };
+          worker.postMessage(input);
+        }}
+      >
+        Click me
+      </button>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
