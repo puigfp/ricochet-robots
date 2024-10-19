@@ -3,12 +3,12 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 
-import * as solver from "ricochet-robots-solver/ricochet_robots_solver";
+import { useFibonnacci } from "./worker/fibonnacci";
 
 function App() {
   const [count, setCount] = useState(0);
-  const [input, setInput] = useState("5");
-  const [result, setResult] = useState(0);
+  const [input, setInput] = useState("42");
+  const fibonacciResult = useFibonnacci(Number(input));
 
   return (
     <>
@@ -33,22 +33,13 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
 
-      <input content={input} onChange={(e) => setInput(e.target.value)} />
-      <p>{result}</p>
-      <button
-        onClick={() => {
-          const worker = new Worker(new URL("./worker.ts", import.meta.url), {
-            type: "module",
-          });
-          worker.onmessage = (ev) => {
-            setResult(ev.data);
-            worker.terminate();
-          };
-          worker.postMessage(input);
-        }}
-      >
-        Click me
-      </button>
+      <input value={input} onChange={(e) => setInput(e.target.value)} />
+      <p>Computation time: {(Math.round(fibonacciResult.elapsedMilliseconds / 100)/ 10).toString()}s</p>
+      <p>
+        {fibonacciResult.result != null
+          ? fibonacciResult.result.toString()
+          : "Waiting for result..."}
+      </p>
     </>
   );
 }
