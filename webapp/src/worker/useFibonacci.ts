@@ -3,7 +3,7 @@ import { useWorkerResult } from "./useWorkerResult";
 import { useElapsedTime } from './useElapsedTime';
 
 // See https://v3.vitejs.dev/guide/features.html#import-with-query-suffixes
-import FibonacciWorker from './useFibonacciWorker?worker';
+import FibonacciWorker from './useFibonacci_worker?worker';
 
 export interface FibonacciHookResult {
   result: number | null;
