@@ -12,7 +12,8 @@ pub fn greet(name: &str) {
 
 #[wasm_bindgen]
 pub fn fib(i: usize) -> usize {
-    if (i < 2) {
+    assert!(i < 100); // fake error to work on web worker error handling
+    if i < 2 {
         return 1;
     }
     fib(i - 1) + fib(i - 2)

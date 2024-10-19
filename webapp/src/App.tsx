@@ -34,11 +34,19 @@ function App() {
       </p>
 
       <input value={input} onChange={(e) => setInput(e.target.value)} />
-      <p>Computation time: {(Math.round(fibonacciResult.elapsedMilliseconds / 100)/ 10).toString()}s</p>
+      <p>
+        Computation time:{" "}
+        {(
+          Math.round(fibonacciResult.elapsedMilliseconds / 100) / 10
+        ).toString()}
+        s
+      </p>
       <p>
         {fibonacciResult.result != null
           ? fibonacciResult.result.toString()
-          : "Waiting for result..."}
+          : fibonacciResult.error != null
+          ? `Error: "${fibonacciResult.error.toString()}"\n${fibonacciResult.error.stack}`
+          : "Running..."}
       </p>
     </>
   );
