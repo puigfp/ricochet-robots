@@ -11,7 +11,7 @@ export interface FibonacciHookResult {
 }
 
 export const useFibonnacci = (n: number): FibonacciHookResult => {
-  const createWorker = useCallback(() => new FibonacciWorker(), [FibonacciWorker])
+  const createWorker = useCallback(() => new FibonacciWorker(), [])
   const result = useWorkerResult<number, number>(createWorker, n);
   const elapsedMilliseconds = useElapsedTime(n, result != null, 500);
   return { result, elapsedMilliseconds };
