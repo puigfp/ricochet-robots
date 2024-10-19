@@ -1,11 +1,11 @@
 self.onmessage = async (ev: MessageEvent) => {
   console.log("worker received event", ev);
   try {
-    const solver = await import(
+    const library = await import(
       "ricochet-robots-solver/ricochet_robots_solver"
     );
     const input = ev.data;
-    const result = solver.fib(input);
+    const result = library.fib(input);
     console.log("worker computed result", result);
     postMessage({ result, error: null });
   } catch (error) {
