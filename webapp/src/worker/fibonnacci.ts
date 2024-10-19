@@ -42,7 +42,7 @@ export const useFibonnacci = (n: number): FibonacciHookResult => {
   return { result, elapsedMilliseconds: elapsed };
 };
 
-export const useElapsedTime = (input: number, finished: boolean): number => {
+export const useElapsedTime = (input: number, finished: boolean, timeout: number): number => {
   const [start, setStart] = useState<number>(Date.now());
   const [elapsed, setElapsed] = useState<number>(0);
 
@@ -58,13 +58,16 @@ export const useElapsedTime = (input: number, finished: boolean): number => {
       return;
     }
 
-    const id = setInterval(() => {
-      setElapsed(Date.now() - start);
-    }, 50);
+    const updateElapsedTime = () => {setElapsed(Date.now() - start)};
+    const intervalId = setInterval(updateElapsedTime, timeout);
     return () => {
-      clearInterval(id);
+      // Update elapsed time one last time
+      updateElapsedTime();
+
+      // Clear background task
+      clearInterval(intervalId);
     };
-  }, [start, finished]);
+  }, [start, finished, timeout]);
 
   return elapsed;
 };
