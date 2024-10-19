@@ -10,7 +10,7 @@ export interface FibonacciHookResult {
 // to WASM)
 export const useFibonnacci = (n: number): FibonacciHookResult => {
   const [result, setResult] = useState<number | null>(null);
-  const elapsed = useElapsedTime(n, result != null);
+  const elapsed = useElapsedTime(n, result != null, 500);
 
   // Whenever the input changes, we terminate the currently running worker and start a new one
   useEffect(() => {
