@@ -1,8 +1,9 @@
-import * as library from "ricochet-robots-solver";
-
 self.onmessage = async (ev: MessageEvent) => {
   console.log("worker received event", ev);
   try {
+    const library = await import(
+      "ricochet-robots-solver"
+    );
     console.log("library", library);
     const input = ev.data;
     const result = library.fib(input);
