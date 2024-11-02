@@ -165,6 +165,10 @@ fn solve<W: WallConfiguration, P: RobotPositions, M: MoveSequence<P>>(
             queue.push(updated_sequence_with_cost);
         }
     }
+    println!(
+        "could not find a solution, {} positions explored",
+        seen.len()
+    );
     None
 }
 #[cfg(test)]
@@ -179,7 +183,7 @@ mod tests {
 
     #[test]
     #[wasm_bindgen_test]
-    fn test_solve() {
+    fn test_solve_with_solution() {
         let board = Board::new(WallConfigurationVecVec {
             height: 6,
             width: 5,
@@ -227,5 +231,27 @@ mod tests {
             // last move should always be made with the target robot
             assert_eq!(solution.move_sequence.last().unwrap().0.robot, robot);
         }
+    }
+
+    #[test]
+    #[wasm_bindgen_test]
+    fn test_solve_with_no_solution() {
+        let board = Board::new(WallConfigurationVecVec {
+            height: 3,
+            width: 3,
+            right_walls: vec![vec![], vec![], vec![]],
+            bottom_walls: vec![vec![], vec![], vec![]],
+        });
+        let robot_positions =
+            RobotPositionsVec::new(vec![Position::new(0, 0), Position::new(1, 1)]);
+        let empty_move_sequence = MoveSequenceLinkedList::<RobotPositionsVec>::empty();
+
+        assert!(solve(
+            &board,
+            robot_positions.clone(),
+            empty_move_sequence.clone(),
+            (0, Position::new(1, 1)), // there's no way for the robot to reach the center of the board!
+        )
+        .is_none());
     }
 }
