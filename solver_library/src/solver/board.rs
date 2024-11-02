@@ -13,6 +13,9 @@ impl<W> Board<W>
 where
     W: WallConfiguration,
 {
+    pub fn new(wall_configuration: W) -> Self {
+        Board { wall_configuration }
+    }
     fn get_valid_up_move<P: RobotPositions>(
         &self,
         robot: usize,
@@ -95,7 +98,7 @@ where
                 row: position.row,
             })
     }
-    fn get_valid_moves_for_robot<P: RobotPositions>(
+    pub fn get_valid_moves_for_robot<P: RobotPositions>(
         &self,
         robot: usize,
         robot_positions: &P,

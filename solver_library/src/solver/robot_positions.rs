@@ -1,10 +1,12 @@
 use super::Position;
 
+use std::hash::Hash;
+
 // Immutable container for the positions of the robots
 // TODO: all types implementing this trait should also be hashable (so that we can dedupe states during the search)
 pub trait RobotPositions
 where
-    Self: Clone,
+    Self: Clone + std::fmt::Debug + Eq + Hash,
 {
     fn get_robot_position(&self, robot: usize) -> &Position;
     fn num_robots(&self) -> usize;
@@ -28,6 +30,13 @@ impl RobotPositionsVec {
     }
 }
 
+impl Eq for RobotPositionsVec {}
+
+impl Hash for RobotPositionsVec {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.positions.hash(state);
+    }
+}
 impl RobotPositions for RobotPositionsVec {
     fn get_robot_position(&self, robot: usize) -> &Position {
         self.positions.get(robot).unwrap()

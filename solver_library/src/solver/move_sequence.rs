@@ -16,7 +16,7 @@ where
 {
     fn empty() -> Self;
     fn append(&self, move_: Move, next_positions: P) -> Self;
-    fn last_position(&self) -> Option<&P>;
+    fn last(&self) -> Option<(&Move, &P)>;
     fn to_vec(self) -> Vec<(Move, P)>;
 }
 
@@ -40,8 +40,8 @@ impl<P: RobotPositions> MoveSequence<P> for MoveSequenceVec<P> {
         MoveSequenceVec { path: path_cloned }
     }
 
-    fn last_position(&self) -> Option<&P> {
-        self.path.last().map(|(_, p)| p)
+    fn last(&self) -> Option<(&Move, &P)> {
+        self.path.last().map(|(move_, position)| (move_, position))
     }
 
     fn to_vec(self) -> Vec<(Move, P)> {
@@ -61,7 +61,7 @@ where
 }
 
 #[derive(Clone)]
-struct MoveSequenceLinkedList<P>(Rc<MoveSequenceLinkedListInner<P>>)
+pub struct MoveSequenceLinkedList<P>(Rc<MoveSequenceLinkedListInner<P>>)
 where
     P: RobotPositions;
 
@@ -78,28 +78,22 @@ impl<P: RobotPositions> MoveSequence<P> for MoveSequenceLinkedList<P> {
         )))
     }
 
-    fn last_position(&self) -> Option<&P> {
+    fn last(&self) -> Option<(&Move, &P)> {
         match self.0.as_ref() {
             MoveSequenceLinkedListInner::Nil => None,
-            MoveSequenceLinkedListInner::Cons(_, positions, _) => Some(positions),
+            MoveSequenceLinkedListInner::Cons(move_, positions, _) => Some((move_, positions)),
         }
     }
 
     fn to_vec(self) -> Vec<(Move, P)> {
         let mut result = vec![];
         let mut current = self.0;
-        loop {
-            match current.as_ref() {
-                MoveSequenceLinkedListInner::Nil => {
-                    result.reverse();
-                    return result;
-                }
-                MoveSequenceLinkedListInner::Cons(move_, position, next) => {
-                    result.push((move_.clone(), position.clone()));
-                    current = next.clone();
-                }
-            }
+        while let MoveSequenceLinkedListInner::Cons(move_, position, next) = current.as_ref() {
+            result.push((move_.clone(), position.clone()));
+            current = next.clone();
         }
+        result.reverse();
+        return result;
     }
 }
 
@@ -117,7 +111,7 @@ mod tests {
     #[wasm_bindgen_test]
     fn test_move_sequences() {
         fn helper<S: MoveSequence<RobotPositionsVec>>(empty: S) {
-            assert!(empty.last_position().is_none());
+            assert!(empty.last().is_none());
             assert_eq!(
                 empty.clone().to_vec().into_iter().collect::<Vec<_>>(),
                 vec![]
@@ -131,7 +125,7 @@ mod tests {
                 },
                 positions_1.clone(),
             );
-            assert_eq!(appended_once.last_position(), Some(&positions_1));
+            assert_eq!(appended_once.last().unwrap().1, &positions_1);
             assert_eq!(
                 appended_once
                     .clone()
@@ -150,7 +144,7 @@ mod tests {
                 },
                 positions_2.clone(),
             );
-            assert_eq!(appended_twice.last_position(), Some(&positions_2));
+            assert_eq!(appended_twice.last().unwrap().1, &positions_2);
             assert_eq!(
                 appended_twice
                     .clone()
