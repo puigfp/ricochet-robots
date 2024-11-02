@@ -93,7 +93,7 @@ impl<P: RobotPositions> MoveSequence<P> for MoveSequenceLinkedList<P> {
             current = next.clone();
         }
         result.reverse();
-        return result;
+        result
     }
 }
 

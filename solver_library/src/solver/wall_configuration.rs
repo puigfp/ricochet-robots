@@ -4,7 +4,6 @@ use super::Position;
 pub trait WallConfiguration {
     fn is_valid(&self) -> bool;
 
-    // XXX: this probably should not live here, it's shared by the entire board
     fn get_height(&self) -> usize;
     fn get_width(&self) -> usize;
 
