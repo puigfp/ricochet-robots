@@ -3,24 +3,26 @@ use std::rc::Rc;
 use super::{robot_positions::RobotPositions, Direction};
 
 // Immutable container for a robot move
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Move {
     pub robot: usize,
     pub direction: Direction,
 }
 
 // Trait for immutable containers holding a sequence of moves
-// TODO: all types implementing this trait should also implement IntoIterator<(Move, P)>
-trait MoveSequence<P>
+pub trait MoveSequence<P>: Clone
 where
     P: RobotPositions,
 {
     fn empty() -> Self;
     fn append(&self, move_: Move, next_positions: P) -> Self;
+    fn last_position(&self) -> Option<&P>;
+    fn to_vec(self) -> Vec<(Move, P)>;
 }
 
 // Move sequence backed by a Vec that's duplicated on append
-struct MoveSequenceVec<P>
+#[derive(Clone)]
+pub struct MoveSequenceVec<P>
 where
     P: RobotPositions,
 {
@@ -37,28 +39,129 @@ impl<P: RobotPositions> MoveSequence<P> for MoveSequenceVec<P> {
         path_cloned.push((move_, next_positions));
         MoveSequenceVec { path: path_cloned }
     }
+
+    fn last_position(&self) -> Option<&P> {
+        self.path.last().map(|(_, p)| p)
+    }
+
+    fn to_vec(self) -> Vec<(Move, P)> {
+        self.path
+    }
 }
 
 // Move sequence backed by a linked list leveraging Rc for structural sharing
 // This should be way faster than MoveSequenceVec when the search is dealing
 // with very long move sequences
-struct MoveSequenceLinkedList<P>
+enum MoveSequenceLinkedListInner<P>
 where
     P: RobotPositions,
 {
-    last_position: Option<(Move, P, Rc<MoveSequenceLinkedList<P>>)>,
+    Nil,
+    Cons(Move, P, Rc<MoveSequenceLinkedListInner<P>>),
 }
 
-impl<P: RobotPositions> MoveSequence<P> for Rc<MoveSequenceLinkedList<P>> {
+#[derive(Clone)]
+struct MoveSequenceLinkedList<P>(Rc<MoveSequenceLinkedListInner<P>>)
+where
+    P: RobotPositions;
+
+impl<P: RobotPositions> MoveSequence<P> for MoveSequenceLinkedList<P> {
     fn empty() -> Self {
-        Rc::new(MoveSequenceLinkedList {
-            last_position: None,
-        })
+        MoveSequenceLinkedList(Rc::new(MoveSequenceLinkedListInner::Nil))
     }
 
     fn append(&self, move_: Move, next_positions: P) -> Self {
-        Rc::new(MoveSequenceLinkedList {
-            last_position: Some((move_, next_positions, self.clone())),
-        })
+        MoveSequenceLinkedList(Rc::new(MoveSequenceLinkedListInner::Cons(
+            move_,
+            next_positions,
+            self.0.clone(),
+        )))
+    }
+
+    fn last_position(&self) -> Option<&P> {
+        match self.0.as_ref() {
+            MoveSequenceLinkedListInner::Nil => None,
+            MoveSequenceLinkedListInner::Cons(_, positions, _) => Some(positions),
+        }
+    }
+
+    fn to_vec(self) -> Vec<(Move, P)> {
+        let mut result = vec![];
+        let mut current = self.0;
+        loop {
+            match current.as_ref() {
+                MoveSequenceLinkedListInner::Nil => {
+                    result.reverse();
+                    return result;
+                }
+                MoveSequenceLinkedListInner::Cons(move_, position, next) => {
+                    result.push((move_.clone(), position.clone()));
+                    current = next.clone();
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
+
+    use crate::solver::{
+        move_sequence::Move, robot_positions::RobotPositionsVec, Direction, Position,
+    };
+
+    use super::{MoveSequence, MoveSequenceLinkedList, MoveSequenceVec};
+
+    #[test]
+    #[wasm_bindgen_test]
+    fn test_move_sequences() {
+        fn helper<S: MoveSequence<RobotPositionsVec>>(empty: S) {
+            assert!(empty.last_position().is_none());
+            assert_eq!(
+                empty.clone().to_vec().into_iter().collect::<Vec<_>>(),
+                vec![]
+            );
+
+            let positions_1 = RobotPositionsVec::new(vec![Position::new(0, 0)]);
+            let appended_once = empty.append(
+                Move {
+                    robot: 0,
+                    direction: Direction::Up,
+                },
+                positions_1.clone(),
+            );
+            assert_eq!(appended_once.last_position(), Some(&positions_1));
+            assert_eq!(
+                appended_once
+                    .clone()
+                    .to_vec()
+                    .into_iter()
+                    .map(|(_, p)| p)
+                    .collect::<Vec<_>>(),
+                vec![positions_1.clone()]
+            );
+
+            let positions_2 = RobotPositionsVec::new(vec![Position::new(1, 1)]);
+            let appended_twice = appended_once.append(
+                Move {
+                    robot: 0,
+                    direction: Direction::Down,
+                },
+                positions_2.clone(),
+            );
+            assert_eq!(appended_twice.last_position(), Some(&positions_2));
+            assert_eq!(
+                appended_twice
+                    .clone()
+                    .to_vec()
+                    .into_iter()
+                    .map(|(_, p)| p)
+                    .collect::<Vec<_>>(),
+                vec![positions_1.clone(), positions_2.clone()]
+            );
+        }
+        helper(MoveSequenceVec::empty());
+        helper(MoveSequenceLinkedList::empty());
     }
 }
