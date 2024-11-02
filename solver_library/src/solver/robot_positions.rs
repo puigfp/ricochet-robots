@@ -19,8 +19,13 @@ where
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct RobotPositionsVec {
-    // TODO: make this private
-    pub positions: Vec<Position>,
+    positions: Vec<Position>,
+}
+
+impl RobotPositionsVec {
+    pub fn new(positions: Vec<Position>) -> Self {
+        RobotPositionsVec { positions }
+    }
 }
 
 impl RobotPositions for RobotPositionsVec {

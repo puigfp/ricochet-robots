@@ -148,14 +148,12 @@ mod tests {
                 bottom_walls: vec![vec![], vec![], vec![1], vec![], vec![]],
             },
         };
-        let robot_positions = RobotPositionsVec {
-            positions: vec![
-                Position::new(0, 0),
-                Position::new(1, 0),
-                Position::new(1, 2),
-                Position::new(1, 4),
-            ],
-        };
+        let robot_positions = RobotPositionsVec::new(vec![
+            Position::new(0, 0),
+            Position::new(1, 0),
+            Position::new(1, 2),
+            Position::new(1, 4),
+        ]);
         type Case = (usize, Vec<(Direction, Position)>);
         let cases: Vec<Case> = vec![
             (0, vec![(Direction::Right, Position::new(0, 4))]),
