@@ -6,7 +6,7 @@ use std::{
 use super::{
     board::Board,
     move_sequence::{Move, MoveSequence},
-    robot_positions::{self, RobotPositions},
+    robot_positions::RobotPositions,
     wall_configuration::WallConfiguration,
     Position,
 };

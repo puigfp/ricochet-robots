@@ -1,12 +1,10 @@
-use std::collections::HashMap;
-
 use wasm_bindgen::prelude::*;
 
 use crate::solver::board::Board;
 use crate::solver::move_sequence::{MoveSequence, MoveSequenceLinkedList};
-use crate::solver::robot_positions::{self, RobotPositionsVec};
+use crate::solver::robot_positions::RobotPositionsVec;
+use crate::solver::solver;
 use crate::solver::wall_configuration::{WallConfiguration, WallConfigurationVecVec};
-use crate::solver::{board, solver};
 use crate::solver::{Direction, Position};
 
 #[wasm_bindgen]
