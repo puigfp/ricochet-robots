@@ -34,7 +34,7 @@ impl PartialOrd for Cost {
     }
 }
 
-struct SequenceWithCost<P, M>
+pub struct SequenceWithCost<P, M>
 where
     P: RobotPositions,
     M: MoveSequence<P>,
@@ -47,6 +47,16 @@ where
     // This fake fields makes the compiler thinks P is actually used in the type
     // definition.
     phantom_position: PhantomData<P>,
+}
+
+impl<P, M> SequenceWithCost<P, M>
+where
+    P: RobotPositions,
+    M: MoveSequence<P>,
+{
+    pub fn moves(&self) -> Vec<(Move, P)> {
+        self.move_sequence.clone().to_vec()
+    }
 }
 
 impl<P, M> PartialEq for SequenceWithCost<P, M>
@@ -85,7 +95,7 @@ where
     }
 }
 
-fn solve<W: WallConfiguration, P: RobotPositions, M: MoveSequence<P>>(
+pub fn solve<W: WallConfiguration, P: RobotPositions, M: MoveSequence<P>>(
     board: &Board<W>,
     robot_positions: P,
     empty_move_sequence: M,
@@ -173,10 +183,9 @@ fn solve<W: WallConfiguration, P: RobotPositions, M: MoveSequence<P>>(
 }
 #[cfg(test)]
 mod tests {
-    use crate::solver::move_sequence::{MoveSequenceLinkedList, MoveSequenceVec};
+    use crate::solver::move_sequence::MoveSequenceLinkedList;
     use crate::solver::robot_positions::RobotPositionsVec;
     use crate::solver::wall_configuration::WallConfigurationVecVec;
-    use crate::RobotPosition;
 
     use super::*;
     use wasm_bindgen_test::wasm_bindgen_test;

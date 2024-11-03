@@ -1,23 +1,23 @@
-mod board;
-mod move_sequence;
-mod robot_positions;
-mod solver;
-mod wall_configuration;
+pub mod board;
+pub mod move_sequence;
+pub mod robot_positions;
+pub mod solver;
+pub mod wall_configuration;
 
 #[derive(Clone, Debug, Hash, PartialEq)]
-struct Position {
+pub struct Position {
     row: usize,
     col: usize,
 }
 
 impl Position {
-    fn new(row: usize, col: usize) -> Self {
+    pub fn new(row: usize, col: usize) -> Self {
         Position { row, col }
     }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum Direction {
+pub enum Direction {
     Up,
     Down,
     Right,
