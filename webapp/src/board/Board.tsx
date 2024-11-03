@@ -249,10 +249,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
       </div>
       <p>
         Computation time:{" "}
-        {(
-          Math.round(solution.elapsedMilliseconds / 10) / 100
-        ).toString()}
-        s
+        {(Math.round(solution.elapsedMilliseconds / 10) / 100).toString()}s
       </p>
       {solution.result != null ? (
         <div>
@@ -266,6 +263,9 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
           </ul>
         </div>
       ) : null}
+      {solution.error != null
+        ? `Error: "${solution.error.toString()}"\n${solution.error.stack}`
+        : null}
     </DndContext>
   );
 };

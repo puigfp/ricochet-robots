@@ -30,10 +30,10 @@ function App() {
 
       <h1>Ricochet Robots ❤️</h1>
       <Board
-        height={5}
+        height={10}
         width={7}
         wallConfiguration={{
-          rightWalls: [[], [2], [], [3], []],
+          rightWalls: [[], [2], [], [3], [], [], [], [], [], []],
           bottomWalls: [[], [], [1], [], [], [], []],
         }}
       />
