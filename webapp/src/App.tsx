@@ -1,7 +1,7 @@
-import { useState } from "react";
+// import { useState } from "react";
 import "./App.css";
 
-import { useFibonnacci } from "./worker/useFibonacci";
+// import { useFibonnacci } from "./worker/useFibonacci";
 import { Board } from "./board/Board";
 
 function App() {

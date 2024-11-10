@@ -6,7 +6,7 @@ import {
   useDroppable,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { robotIcons, targetIcons, wildcardTargetIcon } from "./constants";
 import { useSolution } from "../worker/useSolution";
 import { Results } from "./Results";
@@ -256,7 +256,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
             </div>
             {(selectedMove == 0 || solution.result == null
               ? robotPositions
-              : solution.result[selectedMove - 1].robot_positions
+              : solution.result[selectedMove - 1].robotPositions
             ).map((value, index) => (
               <div
                 style={{

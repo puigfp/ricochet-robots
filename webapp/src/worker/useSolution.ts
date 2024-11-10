@@ -10,7 +10,7 @@ export interface SolutionHookResult {
     | {
         robot: number;
         direction: number;
-        robot_positions: { row: number; col: number }[];
+        robotPositions: { row: number; col: number }[];
       }[]
     | null;
   error: Error | null;

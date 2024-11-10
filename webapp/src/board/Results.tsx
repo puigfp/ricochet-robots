@@ -5,7 +5,7 @@ interface ResultsProps {
   moves: { robot: number; direction: number }[];
   selectedMove: number;
   setSelectedMove: Dispatch<SetStateAction<number>>;
-  setTransition: Dispatch<SetStateAction<bool>>;
+  setTransition: Dispatch<SetStateAction<boolean>>;
 }
 
 export const Results = ({

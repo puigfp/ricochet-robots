@@ -50,6 +50,7 @@ impl Position {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Move {
     pub robot: usize,
     pub direction: usize,

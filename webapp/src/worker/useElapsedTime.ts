@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const useElapsedTime = (input: number, finished: boolean, timeout: number): number => {
+export const useElapsedTime = (input: any, finished: boolean, timeout: number): number => {
   const [start, setStart] = useState<number>(Date.now());
   const [elapsed, setElapsed] = useState<number>(0);
 
