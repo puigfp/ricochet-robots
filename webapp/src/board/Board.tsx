@@ -251,7 +251,8 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "15px",
+                fontSize: "20px",
+                textShadow: "1px 1px 1px black",
               }}
             >
               <Target robot={targetRobot} />
@@ -272,6 +273,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
                   alignItems: "center",
                   justifyContent: "center",
                   transition: transition ? "all .1s" : "",
+                  textShadow: "1px 1px 1px black",
                 }}
               >
                 <Robot key={index} id={index} />
