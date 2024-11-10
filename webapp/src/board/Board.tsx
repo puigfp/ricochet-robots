@@ -65,7 +65,6 @@ const Target = ({ robot }: TargetProps) => {
 interface SquareProps {
   row: number;
   col: number;
-  children: ReactNode;
   topWall: boolean;
   bottomWall: boolean;
   rightWall: boolean;
@@ -74,7 +73,6 @@ interface SquareProps {
 const Square = ({
   row,
   col,
-  children,
   topWall,
   bottomWall,
   rightWall,
@@ -105,9 +103,7 @@ const Square = ({
         flexDirection: "column",
         justifyContent: "center",
       }}
-    >
-      {children}
-    </div>
+    ></div>
   );
 };
 interface BoardProps {
@@ -156,7 +152,14 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
       targetRobot,
     ]
   );
+  const [transition, setTransition] = useState(true);
   const solution = useSolution(solutionInput);
+
+  // HACK: If a robot was moved by drag en drop, transitions were disabled so
+  //  that the robot could teleport. Let's re-enable them so that we have
+  //  nice animations when viewing the solution.
+  useEffect(() => setTransition(true), [robotPositions]);
+
   const handleDragEnd = useCallback(
     (e: DragEndEvent) => {
       console.log(`Element ${e.active.id} dropped over ${e.over?.id}`);
@@ -178,6 +181,9 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
         ) {
           return;
         }
+        // HACK: whenever a robot is moved by drag and drop, we don't want a
+        // transition, we want it to teleport to its new position
+        setTransition(false);
         setRobotPosition(robotId, nextPosition);
       }
       if (e.active.data.current?.target != null) {
@@ -196,6 +202,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
         <DndContext onDragEnd={handleDragEnd}>
           <div
             style={{
+              position: "relative",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -226,24 +233,45 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
                       col == width - 1 ||
                       wallConfiguration.rightWalls[row].includes(col)
                     }
-                  >
-                    {selectedMove == 0 || solution.result == null
-                      ? robotPositions.map((position, index) =>
-                          position.col == col && position.row == row ? (
-                            <Robot key={index} id={index} />
-                          ) : null
-                        )
-                      : solution.result[selectedMove - 1].robot_positions.map(
-                          (position, index) =>
-                            position.col == col && position.row == row ? (
-                              <Robot key={index} id={index} />
-                            ) : null
-                        )}
-                    {targetPosition.row == row && targetPosition.col == col ? (
-                      <Target robot={targetRobot} />
-                    ) : null}
-                  </Square>
+                  />
                 ))}
+              </div>
+            ))}
+            <div
+              style={{
+                position: "absolute",
+                top: `${2 + 34 * targetPosition.row}px`,
+                left: `${2 + 34 * targetPosition.col}px`,
+                height: `${30}px`,
+                width: `${30}px`,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "15px",
+              }}
+            >
+              <Target robot={targetRobot} />
+            </div>
+            {(selectedMove == 0 || solution.result == null
+              ? robotPositions
+              : solution.result[selectedMove - 1].robot_positions
+            ).map((value, index) => (
+              <div
+                style={{
+                  position: "absolute",
+                  top: `${2 + 34 * value.row}px`,
+                  left: `${2 + 34 * value.col}px`,
+                  height: `${30}px`,
+                  width: `${30}px`,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: transition ? "all .1s" : "",
+                }}
+              >
+                <Robot key={index} id={index} />
               </div>
             ))}
           </div>
