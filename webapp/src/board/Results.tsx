@@ -56,7 +56,11 @@ export const Results = ({
         {prependedMoves.map((value, index) => (
           <div
             key={index}
-            onClick={() => setSelectedMove(index)}
+            onClick={() => {
+              // HACK: only enable transitions on a +1 or -1 move
+              setTransition(false);
+              setSelectedMove(index);
+            }}
             style={{
               display: "flex",
               flexDirection: "row",
