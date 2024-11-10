@@ -22,11 +22,7 @@ self.onmessage = async (ev: MessageEvent) => {
     );
     console.log("worker computed result", result);
     postMessage({
-      result: result.map((move) => ({
-        robot: move.robot,
-        direction: move.direction,
-        robot_positions: move.robot_positions.map(p => ({row: p.x, col: p.y})),
-      })),
+      result,
       error: null,
     });
   } catch (error) {
