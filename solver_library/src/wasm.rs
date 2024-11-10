@@ -4,10 +4,10 @@ use serde::Serialize;
 
 use crate::solver::board::Board;
 use crate::solver::move_sequence::{MoveSequence, MoveSequenceLinkedList};
-use crate::solver::robot_positions::{self, RobotPositions, RobotPositionsVec};
+use crate::solver::robot_positions::{RobotPositions, RobotPositionsVec};
 use crate::solver::solver;
 use crate::solver::wall_configuration::{WallConfiguration, WallConfigurationVecVec};
-use crate::solver::{Direction, Position};
+use crate::solver::Direction;
 
 #[wasm_bindgen]
 extern "C" {
@@ -30,16 +30,16 @@ pub fn fib(i: usize) -> usize {
 
 #[wasm_bindgen]
 #[derive(Debug, Serialize)]
-pub struct RobotPosition {
-    pub x: usize,
-    pub y: usize,
+pub struct Position {
+    pub row: usize,
+    pub col: usize,
 }
 
 #[wasm_bindgen]
-impl RobotPosition {
+impl Position {
     #[wasm_bindgen(constructor)]
-    pub fn new(x: usize, y: usize) -> RobotPosition {
-        RobotPosition { x, y }
+    pub fn new(row: usize, col: usize) -> Position {
+        Position { row, col }
     }
 
     // We can't generate WASM bindings for functions of the Display trait!
@@ -53,17 +53,17 @@ impl RobotPosition {
 pub struct Move {
     pub robot: usize,
     pub direction: usize,
-    pub robot_positions: Vec<RobotPosition>,
+    pub robot_positions: Vec<Position>,
 }
 
 #[wasm_bindgen]
 pub fn solve(
-    robot_positions: Vec<RobotPosition>,
+    robot_positions: Vec<Position>,
     height: usize,
     width: usize,
-    right_walls: Vec<RobotPosition>,
-    bottom_walls: Vec<RobotPosition>,
-    target: RobotPosition,
+    right_walls: Vec<Position>,
+    bottom_walls: Vec<Position>,
+    target: Position,
     target_robot: Option<usize>,
 ) -> JsValue {
     let mut right_walls_vec_vec = vec![];
@@ -71,14 +71,14 @@ pub fn solve(
         right_walls_vec_vec.push(vec![]);
     }
     for p in right_walls.iter() {
-        right_walls_vec_vec[p.x].push(p.y);
+        right_walls_vec_vec[p.row].push(p.col);
     }
     let mut bottom_walls_vec_vec = vec![];
     for _ in 0..width {
         bottom_walls_vec_vec.push(vec![]);
     }
     for p in bottom_walls.iter() {
-        bottom_walls_vec_vec[p.y].push(p.x);
+        bottom_walls_vec_vec[p.col].push(p.row);
     }
     let wall_configuration = WallConfigurationVecVec {
         right_walls: right_walls_vec_vec,
@@ -92,14 +92,17 @@ pub fn solve(
     let robot_positions = RobotPositionsVec::new(
         robot_positions
             .into_iter()
-            .map(|p| Position::new(p.x, p.y))
+            .map(|p| crate::solver::Position::new(p.row, p.col))
             .collect(),
     );
     let solution = solver::solve(
         &board,
         robot_positions,
         MoveSequenceLinkedList::empty(),
-        (target_robot.unwrap(), Position::new(target.x, target.y)),
+        (
+            target_robot.unwrap(),
+            crate::solver::Position::new(target.row, target.col),
+        ),
     );
     let output = match solution {
         Some(sequence) => sequence
@@ -115,7 +118,10 @@ pub fn solve(
                 }),
                 robot_positions: (0..robot_positions.num_robots())
                     .map(|i| robot_positions.get_robot_position(i).to_owned())
-                    .map(|p| RobotPosition { x: p.row, y: p.col })
+                    .map(|p| Position {
+                        row: p.row,
+                        col: p.col,
+                    })
                     .collect(),
             })
             .collect(),
