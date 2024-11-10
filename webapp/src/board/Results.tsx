@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
 import { arrowIcons, robotIcons } from "./constants";
 
 interface ResultsProps {
@@ -15,6 +15,36 @@ export const Results = ({
   let prependedMoves: ({ robot: number; direction: number } | null)[] = [null];
   prependedMoves = prependedMoves.concat(moves);
 
+  const setNextMove = useCallback(
+    () =>
+      setSelectedMove((current) =>
+        current + 1 < prependedMoves.length ? current + 1 : current
+      ),
+    [setSelectedMove, prependedMoves.length]
+  );
+  const setPreviousMove = useCallback(
+    () => setSelectedMove((current) => (current > 0 ? current - 1 : current)),
+    [setSelectedMove]
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key == "ArrowUp") {
+        setPreviousMove();
+      } else if (event.key == "ArrowDown") {
+        setNextMove();
+      }
+    };
+
+    // Add event listener to the window
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [setPreviousMove, setNextMove]);
+
   return (
     <div>
       <p>Found solution in {moves.length} moves!</p>
@@ -30,7 +60,9 @@ export const Results = ({
               margin: ".1em 0em",
             }}
           >
-            <div style={{minWidth: "1.5em"}}>{index == selectedMove ? "▶️" : null}</div>
+            <div style={{ minWidth: "1.5em" }}>
+              {index == selectedMove ? "▶️" : null}
+            </div>
             <div>
               {value != null
                 ? `${robotIcons[value.robot]} ${arrowIcons[value.direction]}`
@@ -46,22 +78,10 @@ export const Results = ({
           justifyContent: "center",
         }}
       >
-        <button
-          style={{ margin: "0em 1em" }}
-          onClick={() =>
-            setSelectedMove((current) =>
-              current + 1 < prependedMoves.length ? current + 1 : current
-            )
-          }
-        >
+        <button style={{ margin: "0em 1em" }} onClick={setNextMove}>
           ⬇️ Next
         </button>
-        <button
-          style={{ margin: "0em 1em" }}
-          onClick={() =>
-            setSelectedMove((current) => (current > 0 ? current - 1 : current))
-          }
-        >
+        <button style={{ margin: "0em 1em" }} onClick={setPreviousMove}>
           ⬆️ Prev
         </button>
       </div>
