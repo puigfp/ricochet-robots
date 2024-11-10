@@ -132,7 +132,10 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
   // automatically reset selected move to 0 whenever the input changes
   // (this is a bit hacky because the component tree will be rendered once with the new position
   // and a selected move that can be > 0, but in practice it doesn't cause problems)
-  useEffect(() => setSelectedMove(0), [robotPositions, targetPosition, targetRobot]);
+  useEffect(
+    () => setSelectedMove(0),
+    [robotPositions, targetPosition, targetRobot]
+  );
 
   const solutionInput = useMemo(
     () => ({
@@ -224,11 +227,18 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
                       wallConfiguration.rightWalls[row].includes(col)
                     }
                   >
-                    {robotPositions.map((position, index) =>
-                      position.col == col && position.row == row ? (
-                        <Robot key={index} id={index} />
-                      ) : null
-                    )}
+                    {selectedMove == 0 || solution.result == null
+                      ? robotPositions.map((position, index) =>
+                          position.col == col && position.row == row ? (
+                            <Robot key={index} id={index} />
+                          ) : null
+                        )
+                      : solution.result[selectedMove - 1].robot_positions.map(
+                          (position, index) =>
+                            position.col == col && position.row == row ? (
+                              <Robot key={index} id={index} />
+                            ) : null
+                        )}
                     {targetPosition.row == row && targetPosition.col == col ? (
                       <Target robot={targetRobot} />
                     ) : null}

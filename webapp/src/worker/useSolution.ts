@@ -6,18 +6,24 @@ import { useElapsedTime } from "./useElapsedTime";
 import SolutionWorker from "./useSolution_worker?worker";
 
 export interface SolutionHookResult {
-  result: { robot: number; direction: number }[] | null;
+  result:
+    | {
+        robot: number;
+        direction: number;
+        robot_positions: { row: number; col: number }[];
+      }[]
+    | null;
   error: Error | null;
   elapsedMilliseconds: number;
 }
 
 export interface UseSolutionHookInput {
-  robotPositions: {row: number, col: number}[];
+  robotPositions: { row: number; col: number }[];
   height: number;
   width: number;
   rightWalls: number[][];
   bottomWalls: number[][];
-  target: {row: number, col: number};
+  target: { row: number; col: number };
   targetRobot: number | null;
 }
 
@@ -27,7 +33,11 @@ export const useSolution = (
   const createWorker = useCallback(() => new SolutionWorker(), []);
   const result = useWorkerResult<
     UseSolutionHookInput,
-    { robot: number; direction: number, robotPositions: {row: number, col: number}[]}[]
+    {
+      robot: number;
+      direction: number;
+      robotPositions: { row: number; col: number }[];
+    }[]
   >(createWorker, input);
   const elapsedMilliseconds = useElapsedTime(input, result != null, 500);
   const solutionResult = {
