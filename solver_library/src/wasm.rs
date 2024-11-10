@@ -1,12 +1,12 @@
 use wasm_bindgen::prelude::*;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::solver::board::Board;
 use crate::solver::move_sequence::{MoveSequence, MoveSequenceLinkedList};
 use crate::solver::robot_positions::{RobotPositions, RobotPositionsVec};
 use crate::solver::solver;
-use crate::solver::wall_configuration::{WallConfiguration, WallConfigurationVecVec};
+use crate::solver::wall_configuration::WallConfigurationVecVec;
 use crate::solver::Direction;
 
 #[wasm_bindgen]
@@ -56,37 +56,31 @@ pub struct Move {
     pub robot_positions: Vec<Position>,
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct WallConfiguration {
+    right_walls: Vec<Vec<usize>>,
+    bottom_walls: Vec<Vec<usize>>,
+}
+
 #[wasm_bindgen]
 pub fn solve(
     robot_positions: Vec<Position>,
     height: usize,
     width: usize,
-    right_walls: Vec<Position>,
-    bottom_walls: Vec<Position>,
+    wall_configuration: JsValue,
     target: Position,
     target_robot: Option<usize>,
 ) -> JsValue {
-    let mut right_walls_vec_vec = vec![];
-    for _ in 0..height {
-        right_walls_vec_vec.push(vec![]);
-    }
-    for p in right_walls.iter() {
-        right_walls_vec_vec[p.row].push(p.col);
-    }
-    let mut bottom_walls_vec_vec = vec![];
-    for _ in 0..width {
-        bottom_walls_vec_vec.push(vec![]);
-    }
-    for p in bottom_walls.iter() {
-        bottom_walls_vec_vec[p.col].push(p.row);
-    }
+    let wall_configuration: WallConfiguration = serde_wasm_bindgen::from_value(wall_configuration)
+        .expect("Deserializing wall configuration");
     let wall_configuration = WallConfigurationVecVec {
-        right_walls: right_walls_vec_vec,
-        bottom_walls: bottom_walls_vec_vec,
+        right_walls: wall_configuration.right_walls,
+        bottom_walls: wall_configuration.bottom_walls,
         height,
         width,
     };
-    assert!(wall_configuration.is_valid());
+    assert!(crate::solver::wall_configuration::WallConfiguration::is_valid(&wall_configuration));
 
     let board = Board::new(wall_configuration);
     let robot_positions = RobotPositionsVec::new(

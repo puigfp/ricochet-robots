@@ -6,17 +6,10 @@ self.onmessage = async (ev: MessageEvent) => {
     const { solve, Position } = await import("ricochet-robots-solver");
     const input: UseSolutionHookInput = ev.data;
     const result = solve(
-      input.robotPositions.map(
-        (value) => new Position(value.row, value.col)
-      ),
+      input.robotPositions.map((value) => new Position(value.row, value.col)),
       input.height,
       input.width,
-      input.rightWalls.flatMap((walls, row) =>
-        walls.map((col) => new Position(row, col))
-      ),
-      input.bottomWalls.flatMap((walls, col) =>
-        walls.map((row) => new Position(row, col))
-      ),
+      { rightWalls: input.rightWalls, bottomWalls: input.bottomWalls },
       new Position(input.target.row, input.target.col),
       input.targetRobot != null ? input.targetRobot : undefined
     );
