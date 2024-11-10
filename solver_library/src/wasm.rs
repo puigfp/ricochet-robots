@@ -1,8 +1,10 @@
 use wasm_bindgen::prelude::*;
 
+use serde::Serialize;
+
 use crate::solver::board::Board;
 use crate::solver::move_sequence::{MoveSequence, MoveSequenceLinkedList};
-use crate::solver::robot_positions::RobotPositionsVec;
+use crate::solver::robot_positions::{self, RobotPositions, RobotPositionsVec};
 use crate::solver::solver;
 use crate::solver::wall_configuration::{WallConfiguration, WallConfigurationVecVec};
 use crate::solver::{Direction, Position};
@@ -27,7 +29,7 @@ pub fn fib(i: usize) -> usize {
 }
 
 #[wasm_bindgen]
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct RobotPosition {
     pub x: usize,
     pub y: usize,
@@ -47,11 +49,11 @@ impl RobotPosition {
     }
 }
 
-#[wasm_bindgen]
-#[derive(Debug)]
+#[derive(Serialize)]
 pub struct Move {
     pub robot: usize,
     pub direction: usize,
+    pub robot_positions: Vec<RobotPosition>,
 }
 
 #[wasm_bindgen]
@@ -63,7 +65,7 @@ pub fn solve(
     bottom_walls: Vec<RobotPosition>,
     target: RobotPosition,
     target_robot: Option<usize>,
-) -> Vec<Move> {
+) -> JsValue {
     let mut right_walls_vec_vec = vec![];
     for _ in 0..height {
         right_walls_vec_vec.push(vec![]);
@@ -99,11 +101,11 @@ pub fn solve(
         MoveSequenceLinkedList::empty(),
         (target_robot.unwrap(), Position::new(target.x, target.y)),
     );
-    match solution {
+    let output = match solution {
         Some(sequence) => sequence
             .moves()
             .iter()
-            .map(|(move_, _)| Move {
+            .map(|(move_, robot_positions)| Move {
                 robot: move_.robot,
                 direction: (match move_.direction {
                     Direction::Up => 0,
@@ -111,8 +113,13 @@ pub fn solve(
                     Direction::Down => 2,
                     Direction::Right => 3,
                 }),
+                robot_positions: (0..robot_positions.num_robots())
+                    .map(|i| robot_positions.get_robot_position(i).to_owned())
+                    .map(|p| RobotPosition { x: p.row, y: p.col })
+                    .collect(),
             })
             .collect(),
         None => vec![],
-    }
+    };
+    serde_wasm_bindgen::to_value(&output).unwrap()
 }

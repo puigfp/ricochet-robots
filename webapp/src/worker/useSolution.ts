@@ -27,7 +27,7 @@ export const useSolution = (
   const createWorker = useCallback(() => new SolutionWorker(), []);
   const result = useWorkerResult<
     UseSolutionHookInput,
-    { robot: number; direction: number }[]
+    { robot: number; direction: number, robotPositions: {row: number, col: number}[]}[]
   >(createWorker, input);
   const elapsedMilliseconds = useElapsedTime(input, result != null, 500);
   const solutionResult = {

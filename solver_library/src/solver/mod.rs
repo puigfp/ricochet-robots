@@ -6,8 +6,8 @@ pub mod wall_configuration;
 
 #[derive(Clone, Debug, Hash, PartialEq)]
 pub struct Position {
-    row: usize,
-    col: usize,
+    pub row: usize,
+    pub col: usize,
 }
 
 impl Position {

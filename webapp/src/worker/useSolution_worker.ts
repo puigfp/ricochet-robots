@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { UseSolutionHookInput } from "./useSolution";
 
 self.onmessage = async (ev: MessageEvent) => {
@@ -6,8 +5,6 @@ self.onmessage = async (ev: MessageEvent) => {
   try {
     const { solve, RobotPosition } = await import("ricochet-robots-solver");
     const input: UseSolutionHookInput = ev.data;
-    console.log(input);
-    console.log(input.robotPositions[0]);
     const result = solve(
       input.robotPositions.map(
         (value) => new RobotPosition(value.row, value.col)
@@ -28,6 +25,7 @@ self.onmessage = async (ev: MessageEvent) => {
       result: result.map((move) => ({
         robot: move.robot,
         direction: move.direction,
+        robot_positions: move.robot_positions.map(p => ({row: p.x, col: p.y})),
       })),
       error: null,
     });
