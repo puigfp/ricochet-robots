@@ -8,6 +8,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { ReactNode, useCallback, useMemo, useState } from "react";
 import {
+  arrowIcons,
   robotIcons,
   targetIcons,
   wildcardTargetIcon,
@@ -181,81 +182,87 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
     [robotPositions, setRobotPosition]
   );
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <div style={{ display: "flex", flexDirection: "row" }}>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
+        style={{ display: "flex", flexDirection: "column", padding: "0em 1em" }}
       >
-        {_.range(0, height).map((row) => (
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            {_.range(0, width).map((col) => (
-              <Square
-                key={`${row}_${col}`}
-                row={row}
-                col={col}
-                topWall={
-                  row == 0 ||
-                  (row > 0 &&
-                    wallConfiguration.bottomWalls[col].includes(row - 1))
-                }
-                bottomWall={
-                  row == height - 1 ||
-                  wallConfiguration.bottomWalls[col].includes(row)
-                }
-                leftWall={
-                  col == 0 ||
-                  (col > 1 &&
-                    wallConfiguration.rightWalls[row].includes(col - 1))
-                }
-                rightWall={
-                  col == width - 1 ||
-                  wallConfiguration.rightWalls[row].includes(col)
-                }
-              >
-                {robotPositions.map((position, index) =>
-                  position.col == col && position.row == row ? (
-                    <Robot key={index} id={index} />
-                  ) : null
-                )}
-                {targetPosition.row == row && targetPosition.col == col ? (
-                  <Target robot={targetRobot} />
-                ) : null}
-              </Square>
+        <DndContext onDragEnd={handleDragEnd}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            {_.range(0, height).map((row) => (
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                {_.range(0, width).map((col) => (
+                  <Square
+                    key={`${row}_${col}`}
+                    row={row}
+                    col={col}
+                    topWall={
+                      row == 0 ||
+                      (row > 0 &&
+                        wallConfiguration.bottomWalls[col].includes(row - 1))
+                    }
+                    bottomWall={
+                      row == height - 1 ||
+                      wallConfiguration.bottomWalls[col].includes(row)
+                    }
+                    leftWall={
+                      col == 0 ||
+                      (col > 1 &&
+                        wallConfiguration.rightWalls[row].includes(col - 1))
+                    }
+                    rightWall={
+                      col == width - 1 ||
+                      wallConfiguration.rightWalls[row].includes(col)
+                    }
+                  >
+                    {robotPositions.map((position, index) =>
+                      position.col == col && position.row == row ? (
+                        <Robot key={index} id={index} />
+                      ) : null
+                    )}
+                    {targetPosition.row == row && targetPosition.col == col ? (
+                      <Target robot={targetRobot} />
+                    ) : null}
+                  </Square>
+                ))}
+              </div>
             ))}
           </div>
-        ))}
+        </DndContext>
+        <div>
+          <button
+            style={{ margin: "10px" }}
+            onClick={() => {
+              setTargetRobot((value) => {
+                if (value == null) {
+                  return 0;
+                } else if (value == 3) {
+                  return null;
+                } else {
+                  return (value + 1) % 4;
+                }
+              });
+            }}
+          >
+            Change target color
+          </button>
+        </div>
       </div>
-      <div>
-        <button
-          style={{ margin: "10px" }}
-          onClick={() => {
-            setTargetRobot((value) => {
-              if (value == null) {
-                return 0;
-              } else if (value == 3) {
-                return null;
-              } else {
-                return (value + 1) % 4;
-              }
-            });
-          }}
-        >
-          Change target color
-        </button>
+      <div style={{ padding: "0em 1em", minWidth: "20em" }}>
+        <p>
+          Computation time:{" "}
+          {(Math.round(solution.elapsedMilliseconds / 10) / 100).toString()}s
+        </p>
+        {solution.result != null ? <Results moves={solution.result} /> : null}
+        {solution.error != null
+          ? `Error: "${solution.error.toString()}"\n${solution.error.stack}`
+          : null}
       </div>
-      <p>
-        Computation time:{" "}
-        {(Math.round(solution.elapsedMilliseconds / 10) / 100).toString()}s
-      </p>
-      {solution.result != null ? (
-        <Results moves={solution.result} />
-      ) : null}
-      {solution.error != null
-        ? `Error: "${solution.error.toString()}"\n${solution.error.stack}`
-        : null}
-    </DndContext>
+    </div>
   );
 };
