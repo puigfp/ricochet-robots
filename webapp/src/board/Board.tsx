@@ -202,6 +202,9 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
         <DndContext onDragEnd={handleDragEnd}>
           <div
             style={{
+              // This `position: "relative"` makes the "absolute" positions of
+              // the robots and target be relative to this div instead of the
+              // root of the DOM tree.
               position: "relative",
               display: "flex",
               flexDirection: "column",
