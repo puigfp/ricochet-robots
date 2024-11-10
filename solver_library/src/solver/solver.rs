@@ -104,16 +104,20 @@ pub fn solve<W: WallConfiguration, P: RobotPositions, M: MoveSequence<P>>(
     let mut seen = HashSet::new();
     seen.insert(robot_positions.clone());
 
-    let mut queue = BinaryHeap::new();
-    queue.push(SequenceWithCost {
+    let initial_sequence_with_cost = SequenceWithCost {
         cost: Cost {
             moves: 0,
             robot_change: 0,
         },
         move_sequence: empty_move_sequence,
         phantom_position: PhantomData,
-    });
+    };
+    if robot_positions.get_robot_position(target.0) == &target.1 {
+        return Some(initial_sequence_with_cost);
+    }
 
+    let mut queue = BinaryHeap::new();
+    queue.push(initial_sequence_with_cost);
     while let Some(sequence) = queue.pop() {
         let current_robot_positions = sequence
             .move_sequence
