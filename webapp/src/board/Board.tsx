@@ -1,4 +1,4 @@
-import _, { result } from "lodash";
+import _ from "lodash";
 import {
   DndContext,
   DragEndEvent,
@@ -8,7 +8,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { ReactNode, useCallback, useMemo, useState } from "react";
 import {
-  arrowIcons,
   robotIcons,
   targetIcons,
   wildcardTargetIcon,
@@ -182,7 +181,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
     [robotPositions, setRobotPosition]
   );
   return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
+    <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
       <div
         style={{ display: "flex", flexDirection: "column", padding: "0em 1em" }}
       >
