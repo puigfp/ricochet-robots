@@ -1,3 +1,13 @@
+## Deploying to Vercel
+
+```sh
+cd solver_library/
+wasm-pack build --release
+cd ..
+yarn dlx vercel build --prod
+yarn dlx vercel deploy --prebuilt --prod
+```
+
 ## Tricks
 
 ### Yarn + `node_modules/`
