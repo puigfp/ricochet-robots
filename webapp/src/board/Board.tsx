@@ -155,11 +155,11 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
   const [transition, setTransition] = useState(true);
   const solution = useSolution(solutionInput);
 
-  // HACK: If a robot was moved by drag en drop, transitions were disabled so
-  //  that the robot could teleport. Let's re-enable them so that we have
-  //  nice animations when viewing the solution.
-  useEffect(() => setTransition(true), [robotPositions]);
-
+  const handleDragStart = useCallback(() => {
+    // HACK: whenever a robot is moved by drag and drop, we don't want a
+    // transition, we want it to teleport to its new position
+    setTransition(false);
+  }, [setTransition]);
   const handleDragEnd = useCallback(
     (e: DragEndEvent) => {
       console.log(`Element ${e.active.id} dropped over ${e.over?.id}`);
@@ -181,9 +181,6 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
         ) {
           return;
         }
-        // HACK: whenever a robot is moved by drag and drop, we don't want a
-        // transition, we want it to teleport to its new position
-        setTransition(false);
         setRobotPosition(robotId, nextPosition);
       }
       if (e.active.data.current?.target != null) {
@@ -199,7 +196,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
       <div
         style={{ display: "flex", flexDirection: "column", padding: "0em 1em" }}
       >
-        <DndContext onDragEnd={handleDragEnd}>
+        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div
             style={{
               // This `position: "relative"` makes the "absolute" positions of
@@ -252,7 +249,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: "20px",
-                textShadow: "1px 1px 1px black",
+                // textShadow: "1px 1px 1px black",
               }}
             >
               <Target robot={targetRobot} />
@@ -310,6 +307,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
             moves={solution.result}
             selectedMove={selectedMove}
             setSelectedMove={setSelectedMove}
+            setTransition={setTransition}
           />
         ) : null}
         {solution.error != null

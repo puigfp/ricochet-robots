@@ -5,27 +5,30 @@ interface ResultsProps {
   moves: { robot: number; direction: number }[];
   selectedMove: number;
   setSelectedMove: Dispatch<SetStateAction<number>>;
+  setTransition: Dispatch<SetStateAction<bool>>;
 }
 
 export const Results = ({
   moves,
   selectedMove,
   setSelectedMove,
+  setTransition,
 }: ResultsProps) => {
   let prependedMoves: ({ robot: number; direction: number } | null)[] = [null];
   prependedMoves = prependedMoves.concat(moves);
 
-  const setNextMove = useCallback(
-    () =>
-      setSelectedMove((current) =>
-        current + 1 < prependedMoves.length ? current + 1 : current
-      ),
-    [setSelectedMove, prependedMoves.length]
-  );
-  const setPreviousMove = useCallback(
-    () => setSelectedMove((current) => (current > 0 ? current - 1 : current)),
-    [setSelectedMove]
-  );
+  const setNextMove = useCallback(() => {
+    // HACK: only enable transitions on a +1 or -1 move
+    setTransition(true);
+    setSelectedMove((current) =>
+      current + 1 < prependedMoves.length ? current + 1 : current
+    );
+  }, [setSelectedMove, setTransition, prependedMoves.length]);
+  const setPreviousMove = useCallback(() => {
+    // HACK: only enable transitions on a +1 or -1 move
+    setTransition(true);
+    setSelectedMove((current) => (current > 0 ? current - 1 : current));
+  }, [setSelectedMove, setTransition]);
 
   // Set up event listener on the window object to listen for arrow key presses
   useEffect(() => {
