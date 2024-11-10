@@ -27,6 +27,7 @@ export const Results = ({
     [setSelectedMove]
   );
 
+  // Set up event listener on the window object to listen for arrow key presses
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key == "ArrowUp") {
