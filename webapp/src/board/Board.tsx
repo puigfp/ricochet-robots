@@ -248,7 +248,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "20px",
+                fontSize: "25px",
                 // textShadow: "1px 1px 1px black",
               }}
             >
@@ -263,8 +263,9 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
                   position: "absolute",
                   top: `${2 + 34 * value.row}px`,
                   left: `${2 + 34 * value.col}px`,
-                  height: `${30}px`,
-                  width: `${30}px`,
+                  height: `${20}px`,
+                  width: `${20}px`,
+                  margin: `${5}px`, // leave some margin so that the user can drag the target that might be under the robot
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
