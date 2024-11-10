@@ -8,13 +8,12 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { ReactNode, useCallback, useMemo, useState } from "react";
 import {
-  arrowIcons,
   robotIcons,
   targetIcons,
   wildcardTargetIcon,
 } from "./constants";
 import { useSolution } from "../worker/useSolution";
-import { RobotPosition } from "ricochet-robots-solver";
+import { Results } from "./Results";
 
 interface RobotProps {
   id: number;
@@ -252,16 +251,7 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
         {(Math.round(solution.elapsedMilliseconds / 10) / 100).toString()}s
       </p>
       {solution.result != null ? (
-        <div>
-          <p>Found solution in {solution.result?.length} moves!</p>
-          <ul>
-            {solution.result?.map((value, index) => (
-              <li key={index}>
-                {robotIcons[value.robot]} {arrowIcons[value.direction]}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Results moves={solution.result} />
       ) : null}
       {solution.error != null
         ? `Error: "${solution.error.toString()}"\n${solution.error.stack}`
