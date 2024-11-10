@@ -6,12 +6,8 @@ import {
   useDroppable,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { ReactNode, useCallback, useMemo, useState } from "react";
-import {
-  robotIcons,
-  targetIcons,
-  wildcardTargetIcon,
-} from "./constants";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { robotIcons, targetIcons, wildcardTargetIcon } from "./constants";
 import { useSolution } from "../worker/useSolution";
 import { Results } from "./Results";
 
@@ -131,6 +127,13 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
   ]);
   const [targetPosition, setTargetPosition] = useState({ row: 0, col: 0 });
   const [targetRobot, setTargetRobot] = useState<number | null>(0);
+  const [selectedMove, setSelectedMove] = useState<number>(0);
+
+  // automatically reset selected move to 0 whenever the input changes
+  // (this is a bit hacky because the component tree will be rendered once with the new position
+  // and a selected move that can be > 0, but in practice it doesn't cause problems)
+  useEffect(() => setSelectedMove(0), [robotPositions, targetPosition, targetRobot]);
+
   const solutionInput = useMemo(
     () => ({
       robotPositions,
@@ -181,7 +184,9 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
     [robotPositions, setRobotPosition]
   );
   return (
-    <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+    <div
+      style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+    >
       <div
         style={{ display: "flex", flexDirection: "column", padding: "0em 1em" }}
       >
@@ -257,7 +262,13 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
           Computation time:{" "}
           {(Math.round(solution.elapsedMilliseconds / 10) / 100).toString()}s
         </p>
-        {solution.result != null ? <Results moves={solution.result} /> : null}
+        {solution.result != null ? (
+          <Results
+            moves={solution.result}
+            selectedMove={selectedMove}
+            setSelectedMove={setSelectedMove}
+          />
+        ) : null}
         {solution.error != null
           ? `Error: "${solution.error.toString()}"\n${solution.error.stack}`
           : null}
