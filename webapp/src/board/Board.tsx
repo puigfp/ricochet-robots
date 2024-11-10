@@ -202,10 +202,10 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
             }}
           >
             {_.range(0, height).map((row) => (
-              <div style={{ display: "flex", flexDirection: "row" }}>
+              <div key={row} style={{ display: "flex", flexDirection: "row" }}>
                 {_.range(0, width).map((col) => (
                   <Square
-                    key={`${row}_${col}`}
+                    key={col}
                     row={row}
                     col={col}
                     topWall={
