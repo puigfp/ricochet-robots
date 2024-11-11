@@ -6,13 +6,17 @@ import {
   useDroppable,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { robotIcons, targetIcons, wildcardTargetIcon } from "./constants";
+  robotFontSize,
+  robotIcons,
+  squareBorderWidth,
+  squareSize,
+  squareTotalSize,
+  targetFontSize,
+  targetIcons,
+  wildcardTargetIcon,
+} from "./constants";
 import { useSolution } from "../worker/useSolution";
 import { Results } from "./Results";
 
@@ -80,11 +84,11 @@ const Square = ({
       ref={setNodeRef}
       style={{
         backgroundColor: isOver ? "grey" : "white",
-        width: "30px",
-        height: "30px",
+        width: `${squareSize}px`,
+        height: `${squareSize}px`,
         padding: 0,
         margin: 0,
-        borderWidth: "2px",
+        borderWidth: `${squareBorderWidth}px`,
         borderTopColor: topWall ? wallBorderColor : emptyBorderColor,
         borderBottomColor: bottomWall ? wallBorderColor : emptyBorderColor,
         borderRightColor: rightWall ? wallBorderColor : emptyBorderColor,
@@ -106,13 +110,12 @@ interface BoardProps {
   height: number;
 }
 export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
-  const [robotPositions, setRobotPositions] =
-    useState([
-      { row: 0, col: 0 },
-      { row: 0, col: 1 },
-      { row: 0, col: 2 },
-      { row: 0, col: 3 },
-    ]);
+  const [robotPositions, setRobotPositions] = useState([
+    { row: 0, col: 0 },
+    { row: 0, col: 1 },
+    { row: 0, col: 2 },
+    { row: 0, col: 3 },
+  ]);
   const [targetPosition, setTargetPosition] = useState({ row: 0, col: 0 });
   const [targetRobot, setTargetRobot] = useState<number | null>(0);
   const [selectedMove, setSelectedMove] = useState<number>(0);
@@ -240,16 +243,19 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
             <div
               style={{
                 position: "absolute",
-                top: `${2 + 34 * targetPosition.row}px`,
-                left: `${2 + 34 * targetPosition.col}px`,
-                height: `${30}px`,
-                width: `${30}px`,
+                top: `${
+                  squareBorderWidth + squareTotalSize * targetPosition.row
+                }px`,
+                left: `${
+                  squareBorderWidth + squareTotalSize * targetPosition.col
+                }px`,
+                height: `${squareSize}px`,
+                width: `${squareSize}px`,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "25px",
-                // textShadow: "1px 1px 1px black",
+                fontSize: `${targetFontSize}px`,
               }}
             >
               <Target robot={targetRobot} />
@@ -261,17 +267,19 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
               <div
                 style={{
                   position: "absolute",
-                  top: `${2 + 34 * value.row}px`,
-                  left: `${2 + 34 * value.col}px`,
-                  height: `${20}px`,
-                  width: `${20}px`,
-                  margin: `${5}px`, // leave some margin so that the user can drag the target that might be under the robot
+                  top: `${squareBorderWidth + squareTotalSize * value.row}px`,
+                  left: `${squareBorderWidth + squareTotalSize * value.col}px`,
+                  // leave some margin so that the user can drag the target that might be under the robot
+                  height: `${robotFontSize}px`,
+                  width: `${robotFontSize}px`,
+                  margin: `${(squareSize - robotFontSize) / 2}px`,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                   transition: transition ? "all .1s" : "",
                   textShadow: "1px 1px 1px black",
+                  fontSize: `${robotFontSize}px`,
                 }}
               >
                 <Robot key={index} id={index} />
