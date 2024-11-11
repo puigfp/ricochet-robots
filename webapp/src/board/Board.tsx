@@ -6,7 +6,12 @@ import {
   useDroppable,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { robotIcons, targetIcons, wildcardTargetIcon } from "./constants";
 import { useSolution } from "../worker/useSolution";
 import { Results } from "./Results";
@@ -27,20 +32,6 @@ const Robot = ({ id }: RobotProps) => {
       {robotIcons[id]}
     </div>
   );
-};
-
-const useRobotPositions = (
-  initialPositions: { row: number; col: number }[]
-): [
-  { row: number; col: number }[],
-  (index: number, pos: { row: number; col: number }) => void
-] => {
-  const [robotPositions, setRobotPositions] = useState(initialPositions);
-  const setRobotPosition = (i: number, pos: { row: number; col: number }) =>
-    setRobotPositions((current) =>
-      current.map((value, index) => (i == index ? pos : value))
-    );
-  return [robotPositions, setRobotPosition];
 };
 
 interface TargetProps {
@@ -115,12 +106,13 @@ interface BoardProps {
   height: number;
 }
 export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
-  const [robotPositions, setRobotPosition] = useRobotPositions([
-    { row: 0, col: 0 },
-    { row: 0, col: 1 },
-    { row: 0, col: 2 },
-    { row: 0, col: 3 },
-  ]);
+  const [robotPositions, setRobotPositions] =
+    useState([
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+      { row: 0, col: 3 },
+    ]);
   const [targetPosition, setTargetPosition] = useState({ row: 0, col: 0 });
   const [targetRobot, setTargetRobot] = useState<number | null>(0);
   const [selectedMove, setSelectedMove] = useState<number>(0);
@@ -173,21 +165,29 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
       };
       if (e.active.data.current?.robot != null) {
         const robotId = e.active.data.current.robot.id;
+        const currentPositions =
+          selectedMove == 0 || solution.result == null
+            ? robotPositions
+            : solution.result[selectedMove - 1].robotPositions;
         if (
-          robotPositions.some(
+          currentPositions.some(
             (value) =>
               value.col == nextPosition.col && value.row == nextPosition.row
           )
         ) {
           return;
         }
-        setRobotPosition(robotId, nextPosition);
+        setRobotPositions(
+          currentPositions.map((value, index) =>
+            index == robotId ? nextPosition : value
+          )
+        );
       }
       if (e.active.data.current?.target != null) {
         setTargetPosition(nextPosition);
       }
     },
-    [robotPositions, setRobotPosition]
+    [solution.result, selectedMove, robotPositions, setRobotPositions]
   );
   return (
     <div
