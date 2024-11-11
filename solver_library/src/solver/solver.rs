@@ -104,26 +104,29 @@ pub fn solve<W: WallConfiguration, P: RobotPositions, M: MoveSequence<P>>(
     let mut seen = HashSet::new();
     seen.insert(robot_positions.clone());
 
-    let initial_sequence_with_cost = SequenceWithCost {
+    let mut queue = BinaryHeap::new();
+    queue.push(SequenceWithCost {
         cost: Cost {
             moves: 0,
             robot_change: 0,
         },
         move_sequence: empty_move_sequence,
         phantom_position: PhantomData,
-    };
-    if robot_positions.get_robot_position(target.0) == &target.1 {
-        return Some(initial_sequence_with_cost);
-    }
-
-    let mut queue = BinaryHeap::new();
-    queue.push(initial_sequence_with_cost);
+    });
     while let Some(sequence) = queue.pop() {
         let current_robot_positions = sequence
             .move_sequence
             .last()
             .map(|e| e.1)
             .unwrap_or(&robot_positions);
+        if current_robot_positions.get_robot_position(target.0) == &target.1 {
+            println!(
+                "found solution in {} moves, {} positions explored",
+                sequence.move_sequence.clone().to_vec().len(),
+                seen.len()
+            );
+            return Some(sequence);
+        }
         let valid_moves: Vec<_> = (0..current_robot_positions.num_robots())
             .flat_map(|robot| {
                 board
@@ -163,18 +166,6 @@ pub fn solve<W: WallConfiguration, P: RobotPositions, M: MoveSequence<P>>(
                 },
                 phantom_position: PhantomData,
             };
-            if next_robot_positions.get_robot_position(target.0) == &target.1 {
-                println!(
-                    "found solution in {} moves, {} positions explored",
-                    updated_sequence_with_cost
-                        .move_sequence
-                        .clone()
-                        .to_vec()
-                        .len(),
-                    seen.len()
-                );
-                return Some(updated_sequence_with_cost);
-            }
             seen.insert(next_robot_positions.clone());
             queue.push(updated_sequence_with_cost);
         }
@@ -211,6 +202,7 @@ mod tests {
         ]);
         let empty_move_sequence = MoveSequenceLinkedList::<RobotPositionsVec>::empty();
         let cases: Vec<(usize, Position, usize)> = vec![
+            (0, Position::new(0, 0), 0),
             (0, Position::new(0, 4), 1),
             (0, Position::new(0, 3), 2),
             (0, Position::new(4, 3), 5),
@@ -242,7 +234,9 @@ mod tests {
             assert_eq!(solution.move_sequence.clone().to_vec().len(), moves);
 
             // last move should always be made with the target robot
-            assert_eq!(solution.move_sequence.last().unwrap().0.robot, robot);
+            if moves > 0 {
+                assert_eq!(solution.move_sequence.last().unwrap().0.robot, robot);
+            }
         }
     }
 
