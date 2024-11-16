@@ -187,6 +187,9 @@ export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
         );
       }
       if (e.active.data.current?.target != null) {
+        if (selectedMove > 0 && solution.result != null) {
+          setRobotPositions(solution.result[selectedMove - 1].robotPositions);
+        }
         setTargetPosition(nextPosition);
       }
     },
