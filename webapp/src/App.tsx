@@ -9,7 +9,6 @@ function App() {
   // const fibonacciResult = useFibonnacci(Number(input));
   return (
     <>
-
       {/* <input value={input} onChange={(e) => setInput(e.target.value)} />
       <p>
         Computation time:{" "}
@@ -30,11 +29,45 @@ function App() {
 
       <h1>Ricochet Robots ❤️</h1>
       <Board
-        height={10}
-        width={7}
+        height={16}
+        width={16}
         wallConfiguration={{
-          rightWalls: [[], [2], [], [3], [], [], [], [], [], []],
-          bottomWalls: [[], [], [1], [], [], [], []],
+          rightWalls: [
+            [4],
+            [9],
+            [6],
+            [],
+            [2, 8],
+            [12],
+            [4, 13],
+            [6, 8],
+            [6, 8, 9],
+            [4],
+            [13],
+            [],
+            [6, 12],
+            [5, 9],
+            [2],
+            [5, 10],
+          ],
+          bottomWalls: [
+            [2, 9],
+            [],
+            [3],
+            [4, 14],
+            [8],
+            [5],
+            [2, 12],
+            [6, 8],
+            [4, 6, 8],
+            [13],
+            [0, 7],
+            [],
+            [11],
+            [5, 12],
+            [9],
+            [2, 8],
+          ],
         }}
       />
     </>
