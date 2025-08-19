@@ -111,12 +111,12 @@ interface BoardProps {
 }
 export const Board = ({ width, height, wallConfiguration }: BoardProps) => {
   const [robotPositions, setRobotPositions] = useState([
-    { row: 0, col: 0 },
-    { row: 0, col: 1 },
-    { row: 0, col: 2 },
-    { row: 0, col: 3 },
+    { row: 4, col: 3 },
+    { row: 4, col: 8 },
+    { row: 9, col: 4 },
+    { row: 10, col: 14 },
   ]);
-  const [targetPosition, setTargetPosition] = useState({ row: 0, col: 0 });
+  const [targetPosition, setTargetPosition] = useState({ row: 1, col: 10 });
   const [targetRobot, setTargetRobot] = useState<number | null>(0);
   const [selectedMove, setSelectedMove] = useState<number>(0);
 
