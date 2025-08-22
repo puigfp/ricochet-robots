@@ -1,6 +1,6 @@
 # Ricochets Robots
 
-![](./docs/screenshot.png)
+![](docs/screenshot.png)
 
 This project is a small solver for the [Ricochet Robots game](https://en.wikipedia.org/wiki/Ricochet_Robots).
 
