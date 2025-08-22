@@ -16,6 +16,8 @@ It's implemented in both TypeScript and Rust:
 
 This was mostly a fun weekend project for me to do some frontend and experiment with running Rust in the browser :\)
 
+(I didn't really take the time to clean up the code, so don't look at it too closely)
+
 ##  Development
 
 ### Local development
