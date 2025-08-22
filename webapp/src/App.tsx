@@ -28,6 +28,8 @@ function App() {
       </p> */}
 
       <h1>Ricochet Robots ❤️</h1>
+      <p>You can drag and drop the robots and target to other squares to solve other positions.</p>
+      <p style={{ fontStyle: "italic" }}>(It is not possible to change the layout of the walls, maybe in a future version!)</p>
       <Board
         height={16}
         width={16}

@@ -34,8 +34,10 @@ export const Results = ({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key == "ArrowUp") {
+        event.preventDefault(); // prevent the page from scrolling up
         setPreviousMove();
       } else if (event.key == "ArrowDown") {
+        event.preventDefault(); // prevent the page from scrolling down
         setNextMove();
       }
     };
