@@ -22,8 +22,10 @@ This was mostly a fun weekend project for me to do some frontend and experiment 
 
 ### Local development
 
+- using the right node version: `nvm use`
+- installing Javascript dependencies: `yarn`
 - running the web app locally: `cd webapp/ && yarn run dev`
-- re-compiling the Rust library to WASM: `wasm-pack build` (if the web app is running, it should detect the change and auto-reload)
+- re-compiling the Rust library to WASM: `wasm-pack build` (if the web app is running, it should detect the change and auto-reload) (more info in `solver_libary/README.md`)
 
 ### Deploying to Vercel
 
